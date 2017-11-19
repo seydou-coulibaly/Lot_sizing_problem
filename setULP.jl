@@ -1,7 +1,7 @@
 # --------------------------------------------------------------------------- #
 
 # Setting an ip model of SPP
-function setULP(solverSelected, D, P, H, F)
+function setULP(solverSelected, D, P, H, F, C)
   t = length(D)
   ip = Model(solver=solverSelected)
 
@@ -20,6 +20,11 @@ function setULP(solverSelected, D, P, H, F)
   @constraint(ip , cte1[i=2:t], X[i]+S[i-1]-D[i]-S[i] == 0)
   @constraint(ip , cte2[i=1:t], X[i]-100 * Y[i] <= 0)
   @constraint(ip , cte3, X[1]-D[1]-S[1] == 0)
+  for i=1:t
+    if C[i] != 2
+        @constraint(ip , Y[i] == C[i])
+    end
+  end
 
   return ip, X, Y, S
 end
