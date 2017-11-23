@@ -14,18 +14,14 @@ P = [2, 4, 6, 8, 10]
 H = [3, 2, 3, 2, 0]
 F = [10, 8, 6, 4, 2]
 
-C = [2, 2, 2, 2, 2]
-
 # Proceeding to the optimization
-solverSelected = GLPKSolverMIP()
+solverSelectedLP = GLPKSolverLP()
+solverSelectedMIP = GLPKSolverMIP()
 
-
-ip, X, Y, S = setULP(solverSelected, D, P, H, F, C)
-
+#=
+ip, X, Y, S = setULPMIP(solverSelectedMIP,D,P,H,F)
 println("The optimization problem to be solved is:")
 print(ip)
-
-
 println("Solving...");
 status = solve(ip)
 
@@ -37,8 +33,6 @@ if status == :Optimal
   print("y  = "); println(getvalue(Y))
   print("s  = "); println(getvalue(S))
 end
+=#
 
-
-
-
-#branchANDBound(solverSelected,D, P, H, F)
+branchANDBound(solverSelectedLP,D,P,H,F)

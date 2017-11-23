@@ -60,7 +60,7 @@ function branchANDBound(solverSelected,D,P,H,F)
         #si solution est entiere, faire mis a jour
         verif = true
         for i=1:t
-          verif = verif && isinteger(x[i])
+          verif = verif && isinteger(y[i])
         end
         if verif
           #tous les solutions sont donc entières, noeud sondé
