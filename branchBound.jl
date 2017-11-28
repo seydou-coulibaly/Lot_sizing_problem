@@ -9,17 +9,18 @@ end
 
 
 # Banch and bound algorithm
-function branchANDBound(solverSelected,D,P,H,F)
+function branchANDBound(solverSelected,D,P,H,F,M)
 
   # =========================================================================== #
   # INIT
   t = length(D)
   # ---------------------------------------------------------------------------
   # Borne primale : fixer tous les Y[i] à 1
+  C = zeros(Int,t)
   for i=1:t
     C[i] = 1
   end
-  ip,zx,zy,zs = setULP(solverSelected,D,P,H,F,C)
+  ip,zx,zy,zs = setULPLP(solverSelected,D,P,H,F,M,C)
   solve(ip)
   bornePrimale = getobjectivevalue(ip)
   zx = getvalue(zx)
@@ -30,7 +31,7 @@ function branchANDBound(solverSelected,D,P,H,F)
   for i=1:t
     C[i] = 2
   end
-  ip,x,y,s = setULP(solverSelected,D,P,H,F,C)
+  ip,x,y,s = setULPLP(solverSelected,D,P,H,F,M,C)
   solve(ip)
   borneDuale = getobjectivevalue(ip)
   # ---------------------------------------------------------------------------
@@ -40,7 +41,8 @@ function branchANDBound(solverSelected,D,P,H,F)
 
 
   listeNoeud = Noeud[]
-  init = Noeud(1,C)
+  number = 0
+  init = Noeud(number,C)
   push!(listeNoeud,init)
 
   while length(listeNoeud) > 0
@@ -48,11 +50,12 @@ function branchANDBound(solverSelected,D,P,H,F)
     noeudCourant = shift!(listeNoeud)
     print("\n--------------------  Noeud ",noeudCourant.num); println(" --------------------")
     println(noeudCourant.Y)
-    ip,x,y,s = setULP(solverSelected,D,P,H,F,noeudCourant.Y)
+    ip,x,y,s = setULPLP(solverSelected,D,P,H,F,M,noeudCourant.Y)
     status = solve(ip)
 
     if status != :Infeasible
       z = getobjectivevalue(ip)
+      println("Valeur de Z = ",z)
       if z < bornePrimale
         x = getvalue(x)
         y = getvalue(y)
@@ -66,11 +69,9 @@ function branchANDBound(solverSelected,D,P,H,F)
           #tous les solutions sont donc entières, noeud sondé
           println("Noeud sondé : solution entière")
           zx,zy,zs = x,y,s
-          println("z = ",z)
           println("x  = ",zx);
           println("y  = ",zy);
           println("s  = ",zs);
-
           bornePrimale = z
         else
           # separer le noeud
@@ -80,15 +81,20 @@ function branchANDBound(solverSelected,D,P,H,F)
             # fils droit
             fdContrainte = copy(noeudCourant.Y)
             fdContrainte[indice] = 1
-            fd = Noeud((noeudCourant.num+2),fdContrainte)
+            fdIndice = number+2
+            fd = Noeud(fdIndice,fdContrainte)
+            # Inserer Au debut de la liste
             unshift!(listeNoeud,fd)
-            print("\nSeparer sur fils droit Y[",indice);println("] = 1 -------",(noeudCourant.num+2))
+            print("\nSeparer sur fils droit Y[",indice);println("] = 1 -------  Noeud",fdIndice)
             # fils gauche
             fgContrainte = copy(noeudCourant.Y)
             fgContrainte[indice] = 0
-            fg = Noeud((noeudCourant.num+1),fgContrainte)
+            fgIndice = number+1
+            fg = Noeud(fgIndice,fgContrainte)
+            # Inserer Au debut de la liste
             unshift!(listeNoeud,fg)
-            print("Separer sur fils gauch Y[",indice);println("] = 0 -------",(noeudCourant.num+1))
+            print("Separer sur fils gauch Y[",indice);println("] = 0 -------  Noeud",fgIndice)
+            number = number+2
           else
             println("Separation effectuée sur tous les Y[i]")
           end
@@ -108,4 +114,8 @@ function branchANDBound(solverSelected,D,P,H,F)
   println("x  = ",zx);
   println("y  = ",zy);
   println("s  = ",zs);
+end
+
+function separationProblemConstraint(X,Y,i,t)
+  sum(min(X[i],diL*Y[i]) for i=1:l,diL=sum(X[k] for k=i:l)) # < sum(D[k] for k=1:l)
 end
