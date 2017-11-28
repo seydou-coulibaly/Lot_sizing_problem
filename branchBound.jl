@@ -20,8 +20,8 @@ function branchANDBound(solverSelected,D,P,H,F,M)
   for i=1:t
     C[i] = 1
   end
-  # ip,zx,zy,zs = setULPLP(solverSelected,D,P,H,F,M,C)
-  ip,zx,zy,zs = model3(solverSelectedLP,D,P,H,F,M,C)
+  ip,zx,zy,zs = setULPLP(solverSelected,D,P,H,F,M,C)
+  #ip,zx,zy,zs = model3(solverSelectedLP,D,P,H,F,M,C)
   solve(ip)
   bornePrimale = getobjectivevalue(ip)
   zx = getvalue(zx)
@@ -32,8 +32,8 @@ function branchANDBound(solverSelected,D,P,H,F,M)
   for i=1:t
     C[i] = 2
   end
-  # ip,x,y,s = setULPLP(solverSelected,D,P,H,F,M,C)
-  ip,x,y,s = model3(solverSelectedLP,D,P,H,F,M,C)
+  ip,x,y,s = setULPLP(solverSelected,D,P,H,F,M,C)
+  #ip,x,y,s = model3(solverSelectedLP,D,P,H,F,M,C)
   solve(ip)
   borneDuale = getobjectivevalue(ip)
   # ---------------------------------------------------------------------------
@@ -52,8 +52,8 @@ function branchANDBound(solverSelected,D,P,H,F,M)
     noeudCourant = shift!(listeNoeud)
     print("\n--------------------  Noeud ",noeudCourant.num); println(" --------------------")
     println(noeudCourant.Y)
-    # ip,x,y,s = setULPLP(solverSelected,D,P,H,F,M,noeudCourant.Y)
-    ip,x,y,s = model3(solverSelectedLP,D,P,H,F,M,noeudCourant.Y)
+    ip,x,y,s = setULPLP(solverSelected,D,P,H,F,M,noeudCourant.Y)
+    #ip,x,y,s = model3(solverSelectedLP,D,P,H,F,M,noeudCourant.Y)
     status = solve(ip)
 
     if status != :Infeasible
