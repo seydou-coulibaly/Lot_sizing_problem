@@ -20,7 +20,7 @@ t = length(D)
 for i=1:t
   M[i] = sum(D[k] for k=i:t)
 end
-M = [100,100,100,100,100]
+#M = [100,100,100,100,100]
 
 # Proceeding to the optimization
 solverSelectedLP = GLPKSolverLP()

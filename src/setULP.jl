@@ -21,7 +21,7 @@ function setULPLP(solverSelected,D,P,H,F,M,Contraintes)
   @constraint(ip , cte2[i=1:t], X[i]-M[i]*Y[i] <= 0)
   @constraint(ip , cte3, X[1]-D[1]-S[1] == 0)
   # Inegalités valides
-  # @constraint(ip , cte4[i=2:t], S[i-1] >= D[i]*(1-Y[i])) #contrainte 22
+  @constraint(ip , cte4[i=2:t], S[i-1] >= D[i]*(1-Y[i])) #contrainte 22
   for i=1:t
     if Contraintes[i] != 2
         @constraint(ip , Y[i] == Contraintes[i])
