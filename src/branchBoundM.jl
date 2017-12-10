@@ -1,45 +1,20 @@
 # --------------------------------------------------------------------------- #
+
 # Definition Type Noeud
-type Noeud
+type Node
   num::Int
-  Y::Array{Int64,1}
+  Y::Array{Int64,2}
 end
 
 # Banch and bound algorithm
-
-function branchANDBoundsetMCLSP(solverSelected,D,P,H,F,B,C,M,V,PHI)
+function resolutionMultiProduit(solverSelected,D,P,H,F,B,C,M,V,PHI)
   # INIT
   N,T = size(D)
-  N = 4
-  T = 4
-  X = zeros(Int,N,T)
-  Y = zeros(Int,N,T)
-  S = zeros(Int,N,T)
-  R = zeros(Int,N,T)
-  Z = 0
-  for i=1:N
-    z,zx,zy,zs,zr = miniBranchANDBound(solverSelected,D[i,:],P[i,:],H[i,:],F[i,:],B[i,:],C,M[i,:],V[i,:],PHI[i,:])
-  end
-  println("Somme = ",somme)
-end
-
-# =====================================================================================================================================
-#       MINI BRANCH AND BOUND
-# =====================================================================================================================================
-
-
-# Mini Banch and bound algorithm sur les produits deja connus
-function miniBranchANDBound(solverSelected,D,P,H,F,B,C,M,V,PHI)
-
-  # =========================================================================== #
-  # INIT
-  t = length(D)
-  t = 4
+  #
   # ---------------------------------------------------------------------------
-  # Borne primale : fixer tous les Y[i] à 1
-  Contraintes = ones(Int,t)
-  println(Contraintes)
-  ip,zx,zy,zs,zr = setminLP(solverSelected,D,P,H,F,B,C,M,V,PHI,Contraintes)
+  # Borne primale : fixer tous les Y[i,t] à 1
+  Contraintes = ones(Int,N,T)
+  ip,zx,zy,zs,zr =  setMCLSP(solverSelected,D,V,C,P,F,H,M,PHI,B,Contraintes)
   solve(ip)
   bornePrimale = getobjectivevalue(ip)
   zx = getvalue(zx)
@@ -48,32 +23,33 @@ function miniBranchANDBound(solverSelected,D,P,H,F,B,C,M,V,PHI)
   zr = getvalue(zr)
   #  --------------------------------------------------------------------------
   # Borne duale
-  Contraintes = fill(2,t)
-  ip,x,y,s,r = setminLP(solverSelected,D,P,H,F,B,C,M,V,PHI,Contraintes)
+  Contraintes = fill(2,N,T)
+  ip,x,y,s,r =  setMCLSP(solverSelected,D,V,C,P,F,H,M,PHI,B,Contraintes)
   solve(ip)
   borneDuale = getobjectivevalue(ip)
   # ---------------------------------------------------------------------------
   println("")
   println("Borne primale  = ", bornePrimale)
-  println("Borne duale  = ", borneDuale)
+  println("Borne duale    = ", borneDuale)
+  println("------------------------ Log -------------------------------------")
 
 
-  listeNoeud = Noeud[]
+  listeNoeud = Node[]
   number = 0
-  init = Noeud(number,Contraintes)
+  init = Node(number,Contraintes)
   push!(listeNoeud,init)
 
   while length(listeNoeud) > 0
     # Brancher sur le premier noeud de la liste
     noeudCourant = shift!(listeNoeud)
-    print("\n--------------------  Noeud ",noeudCourant.num); println(" --------------------")
-    println(noeudCourant.Y)
-    ip,x,y,s,r = setminLP(solverSelected,D,P,H,F,B,C,M,V,PHI,noeudCourant.Y)
+    # print("\n--------------------  Noeud ",noeudCourant.num); println(" --------------------")
+    # println(noeudCourant.Y)
+    ip,x,y,s,r =  setMCLSP(solverSelected,D,V,C,P,F,H,M,PHI,B,noeudCourant.Y)
     status = solve(ip)
 
     if status != :Infeasible
       z = getobjectivevalue(ip)
-      println("Valeur de Z = ",z)
+      # println("Valeur de Z = ",z)
       if z < bornePrimale
         x = getvalue(x)
         y = getvalue(y)
@@ -81,59 +57,66 @@ function miniBranchANDBound(solverSelected,D,P,H,F,B,C,M,V,PHI)
         r = getvalue(r)
         #si solution est entiere, faire mis a jour
         verif = true
-        for i=1:t
-          verif = verif && isinteger(y[i])
+        for i=1:N
+          for t=1:T
+            verif = verif && isinteger(y[i,t])
+          end
         end
         if verif
           #tous les solutions sont donc entières, noeud sondé
-          println("Noeud sondé : solution entière")
+          # println("Noeud sondé : solution entière")
           zx,zy,zs = x,y,s
-          println("x  = ",zx);
-          println("y  = ",zy);
-          println("s  = ",zs);
-          println("r  = ",zr);
+          # println("x  = ",zx);
+          # println("y  = ",zy);
+          # println("s  = ",zs);
+          # println("r  = ",zr);
           bornePrimale = z
         else
           # separer le noeud
           verif = 2 in noeudCourant.Y
           if verif
-            indice = findfirst(noeudCourant.Y,2)
+            indL = findfirst(noeudCourant.Y,2)
+            indL = indL % N
+            if indL == 0
+              indL = N
+            end
+            indC = findfirst(noeudCourant.Y[indL,:],2)
             # fils droit
             fdContrainte = copy(noeudCourant.Y)
-            fdContrainte[indice] = 1
+            fdContrainte[indL,indC] = 1
             fdIndice = number+2
-            fd = Noeud(fdIndice,fdContrainte)
+            fd = Node(fdIndice,fdContrainte)
             # Inserer Au debut de la liste
             unshift!(listeNoeud,fd)
-            print("\nSeparer sur fils droit Y[",indice);println("] = 1 -------  Noeud",fdIndice)
+            # print("\nSeparer sur fils droit Y[",indL);print(",",indC);println("] = 1 -------  Noeud",fdIndice)
             # fils gauche
             fgContrainte = copy(noeudCourant.Y)
-            fgContrainte[indice] = 0
+            fgContrainte[indL,indC] = 0
             fgIndice = number+1
-            fg = Noeud(fgIndice,fgContrainte)
+            fg = Node(fgIndice,fgContrainte)
             # Inserer Au debut de la liste
             unshift!(listeNoeud,fg)
-            print("Separer sur fils gauch Y[",indice);println("] = 0 -------  Noeud",fgIndice)
+            # print("Separer sur fils gauch Y[",indL);print(",",indC);println("] = 0 -------  Noeud",fgIndice)
             number = number+2
           else
-            println("Separation effectuée sur tous les Y[i]")
+            # println("Separation effectuée sur tous les Y[i,t]")
           end
         end
       else
-        println("Noeud sondé : Une meilleure solution entière connue")
+        # println("Noeud sondé : Une meilleure solution entière connue")
       end
     else
-      println("Noeud sondé : Infaisabilité")
+      # println("Noeud sondé : Infaisabilité")
     end
   end
   # Afficher la solution trouvée
   println("---------------------------------------------------")
   println("           Valeur optimale                         ")
   println("---------------------------------------------------")
-  println("BornePrimale = ",bornePrimale)
-  println("x  = ",zx);
-  println("y  = ",zy);
-  println("s  = ",zs);
-  println("r  = ",zr);
-  return bornePrimale,zx,zy,zs,zr
+  println("Zopt : ",bornePrimale)
+  println("Nb noeuds : ",number)
+  println("x  : ",zx);
+  println("y  : ",zy);
+  println("s  : ",zs);
+  println("r  : ",zr);
 end

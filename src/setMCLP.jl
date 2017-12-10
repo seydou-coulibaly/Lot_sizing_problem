@@ -1,14 +1,8 @@
-# =============================================================================================================
- # Model LP
-# =============================================================================================================
-
+# ------------------------------------   Model LP ----------------------------------------------------
 # Setting an ip model of SLP
 function setMCLSP(solverSelected,D,V,C,P,F,H,M,PHI,B,Contraintes)
   N,T = size(D)
-  N = 4
-  T = 4
   ip = Model(solver=solverSelected)
-
   #Variables definitions
   @variable(ip, X[1:N,1:T] >= 0)
   @variable(ip, 0 <= Y[1:N,1:T] <= 1)
@@ -22,8 +16,8 @@ function setMCLSP(solverSelected,D,V,C,P,F,H,M,PHI,B,Contraintes)
                     sum(B[i,t] * R[i,t] for i=1:N,t=1:T)
                   )
 
-  #Constraints of problem
-  #------------------------ constraint 1 (contrôle de flux) -----------------------------------
+  # Constraints of problem
+  # constraint 1 (contrôle de flux)
   for i=1:N
     for t=2:N
       @constraint(ip,X[i,t]+R[i,t]-R[i,t-1]+S[i,t-1]-D[i,t]-S[i,t] == 0)
@@ -31,7 +25,7 @@ function setMCLSP(solverSelected,D,V,C,P,F,H,M,PHI,B,Contraintes)
     @constraint(ip,X[i,1]+R[i,1]-D[i,1]-S[i,1] == 0)
 
   end
-  #------------------------ constraint 2 (if Y = 0 then X == 0) --------------------------------
+  # constraint 2 (if Y = 0 then X == 0)
   for i=1:N
     for t=1:T
       @constraint(ip,X[i,t]-C[t]*Y[i,t] <= 0)
@@ -40,7 +34,7 @@ function setMCLSP(solverSelected,D,V,C,P,F,H,M,PHI,B,Contraintes)
       @constraint(ip,R[1,t] <= D[i,t])
     end
   end
-  #--------------------------- Contraintes pour branch and bound ---------------------------------
+  # Contraintes pour branch and bound
   for i = 1:N
     for t = 1:T
       if Contraintes[i,t] != 2
@@ -51,15 +45,10 @@ function setMCLSP(solverSelected,D,V,C,P,F,H,M,PHI,B,Contraintes)
   return ip, X, Y, S, R
 end
 
-# =============================================================================================================
- # Model MIP
-# =============================================================================================================
+# --------------------------------------   Model MIP  ----------------------------------------------------------
 function setMCLSPMIP(solverSelected,D,V,C,P,F,H,M,PHI,B)
   N,T = size(D)
-  N = 4
-  T = 4
   ip = Model(solver=solverSelected)
-
   #Variables definitions
   @variable(ip, X[1:N,1:T] >= 0)
   @variable(ip,Y[1:N,1:T], Bin )
@@ -74,7 +63,7 @@ function setMCLSPMIP(solverSelected,D,V,C,P,F,H,M,PHI,B)
                   )
 
   #Constraints of problem
-  #------------------------ constraint 1 (contrôle de flux) -----------------------------------
+  # constraint 1 (contrôle de flux)
   for i=1:N
     for t=2:N
       @constraint(ip,X[i,t]+R[i,t]-R[i,t-1]+S[i,t-1]-D[i,t]-S[i,t] == 0)
@@ -82,7 +71,7 @@ function setMCLSPMIP(solverSelected,D,V,C,P,F,H,M,PHI,B)
     @constraint(ip,X[i,1]+R[i,1]-D[i,1]-S[i,1] == 0)
 
   end
-  #------------------------ constraint 2 (if Y = 0 then X == 0) --------------------------------
+  # constraint 2 (if Y = 0 then X == 0)
   for i=1:N
     for t=1:T
       @constraint(ip,X[i,t]-C[t]*Y[i,t] <= 0)
@@ -93,9 +82,7 @@ function setMCLSPMIP(solverSelected,D,V,C,P,F,H,M,PHI,B)
   end
   return ip, X, Y, S, R
 end
-# ==========================================================================================================
-#   MINI LP
-# ==========================================================================================================
+# ----------------------------------------  Model LP mono-Produit avec backlog  -------------------------------------------------------
 # Setting an ip model of SLP
 function setminLP(solverSelected,D,P,H,F,B,C,M,V,PHI,Contraintes)
   t = length(D)
