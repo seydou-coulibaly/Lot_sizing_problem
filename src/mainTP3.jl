@@ -4,7 +4,8 @@ include("setMCLP.jl")
 include("branchBoundM.jl")
 
 # --------------------------------------- Execution Model LP pour multiple produit -----------------------------------------------
-function modelLp_MCLS()
+function modelLp_MultiProduit(solverSelectedLP,D,V,C,P,F,H,M,PHI,B)
+  N,T = size(D)
   # paramètre optionnel
   Contraintes = fill(2,N,T)
   ip, X, Y, S, R = setMCLSP(solverSelectedLP,D,V,C,P,F,H,M,PHI,B,Contraintes)
@@ -15,51 +16,109 @@ function modelLp_MCLS()
   # Displaying the results
   if status == :Optimal
     println("status = ", status)
-    println("z  = ", getobjectivevalue(ip))
+    println("Zopt  = ", getobjectivevalue(ip))
 
     x = getvalue(X)
     y = getvalue(Y)
     s = getvalue(S)
     r = getvalue(R)
 
+    println("X  : ",x);
+    println("Y  : ",y);
+    println("S  : ",s);
+    println("R  : ",r);
+
+    #=
+
     println("=======================   X ==========================")
-    for t=1:T
-      for i=0:(N-1)
-        ind = (N)*i + t
-        print("",round(x[ind],3));print("\t & \t ")
+    X = zeros(N,T)
+    i = 1
+    t = 1
+    for k = 1:(N*T)
+      X[i,t] = x[k]
+      if i == N
+        i = 0
+        t+=1
       end
+      i+=1
+    end
+    for i = 1:N
+      print("P",i);
+      for t = 1:T
+        print("  ");
+        print(trunc(Int,X[i,t]))
+      end
+      #println(" \\\\ ")
       println()
     end
     println("=======================   Y ==========================")
-    for t=1:T
-      for i=0:(N-1)
-        ind = (N)*i + t
-        print("",round(y[ind],2));print(" \t & \t ")
+    Y = zeros(N,T)
+    i = 1
+    t = 1
+    for k = 1:(N*T)
+      Y[i,t] = y[k]
+      if i == N
+        i = 0
+        t+=1
       end
+      i+=1
+    end
+    for i = 1:N
+      print("P",i);
+      for t = 1:T
+        print("  ");print(round(Y[i,t],2))
+      end
+      #println(" \\\\ ")
       println()
     end
     println("=======================   S ==========================")
-    for t=1:T
-      for i=0:(N-1)
-        ind = (N)*i + t
-        print("",round(s[ind],3));print("\t & \t ")
+    S = zeros(N,T)
+    i = 1
+    t = 1
+    for k = 1:(N*T)
+      S[i,t] = s[k]
+      if i == N
+        i = 0
+        t+=1
       end
+      i+=1
+    end
+    for i = 1:N
+      print("P",i);
+      for t = 1:T
+        print("  ");print(trunc(Int,S[i,t]))
+      end
+      #println(" \\\\ ")
       println()
     end
     println("=======================   R ==========================")
-    for t=1:T
-      for i=0:(N-1)
-        ind = (N)*i + t
-        print("",round(r[ind],3));print("\t & \t  ")
+    R = zeros(N,T)
+    i = 1
+    t = 1
+    for k = 1:(N*T)
+      R[i,t] = r[k]
+      if i == N
+        i = 0
+        t+=1
       end
+      i+=1
+    end
+    for i = 1:N
+      print("P",i);
+      for t = 1:T
+        print("  ");print(trunc(Int,R[i,t]))
+      end
+      #println(" \\\\ ")
       println()
     end
+    =#
   end
 
 end
 
 #-------------------------------------------   Execution Model MIP pour multiple produit  ------------------------------------
-function modelMIP_MCLS(solver)
+function modelMIP_MultiProduit(solver,D,V,C,P,F,H,M,PHI,B)
+  N,T = size(D)
   if solver == "CPLEX"
     solverSelect = solverSelectedCPLEX
   else
@@ -73,46 +132,103 @@ function modelMIP_MCLS(solver)
   # Displaying the results
   if status == :Optimal
     println("status = ", status)
-    println("z  = ", getobjectivevalue(ip))
+    println("Zopt  = ", getobjectivevalue(ip))
 
     x = getvalue(X)
     y = getvalue(Y)
     s = getvalue(S)
     r = getvalue(R)
 
+    println("X  : ",x);
+    println("Y  : ",y);
+    println("S  : ",s);
+    println("R  : ",r);
+
+    #=
+
+
+
     println("=======================   X ==========================")
-    for t=1:T
-      for i=0:(N-1)
-        ind = N*i + t
-        print("",round(x[ind],3));print("\t & \t ")
+    X = zeros(N,T)
+    i = 1
+    t = 1
+    for k = 1:(N*T)
+      X[i,t] = x[k]
+      if i == N
+        i = 0
+        t+=1
       end
+      i+=1
+    end
+    for i = 1:N
+      print("P",i);
+      for t = 1:T
+        print("  ");print(round(X[i,t],2) )
+      end
+      #print("\\\\")
       println()
     end
     println("=======================   Y ==========================")
-    for t=1:T
-      for i=0:(N-1)
-        ind = N*i + t
-        print("",round(y[ind],2));print(" \t & \t ")
+    Y = zeros(N,T)
+    i = 1
+    t = 1
+    for k = 1:(N*T)
+      Y[i,t] = y[k]
+      if i == N
+        i = 0
+        t+=1
       end
+      i+=1
+    end
+    for i = 1:N
+      print("P",i);
+      for t = 1:T
+        print("  ");print(trunc(Int,Y[i,t]))
+      end
+      #print("\\\\")
       println()
     end
     println("=======================   S ==========================")
-    for t=1:T
-      for i=0:(N-1)
-        ind = N*i + t
-        print("",round(s[ind],3));print("\t & \t ")
+    S = zeros(N,T)
+    i = 1
+    t = 1
+    for k = 1:(N*T)
+      S[i,t] = s[k]
+      if i == N
+        i = 0
+        t+=1
       end
+      i+=1
+    end
+    for i = 1:N
+      print("P",i);
+      for t = 1:T
+        print("  ");print(trunc(Int,S[i,t]))
+      end
+      #print("\\\\")
       println()
     end
     println("=======================   R ==========================")
-    for t=1:T
-      for i=0:(N-1)
-        ind = N*i + t
-        print("",round(r[ind],3));print("\t & \t  ")
+    R = zeros(N,T)
+    i = 1
+    t = 1
+    for k = 1:(N*T)
+      R[i,t] = r[k]
+      if i == N
+        i = 0
+        t+=1
       end
+      i+=1
+    end
+    for i = 1:N
+      print("P",i);
+      for t = 1:T
+        print("  ");print(trunc(Int,R[i,t]))
+      end
+      #print("\\\\")
       println()
     end
+    =#
   end
 
 end
-#-----------------------------------------  Execution ------------------------------------------------------------------------

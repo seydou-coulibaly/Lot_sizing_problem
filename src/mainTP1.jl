@@ -8,12 +8,7 @@ include("branchBound.jl")
 
 
 #------------------------------------------ Execution Model MIP tp1 -------------------------------------------------------
-function modelMip_MonoProduit(solver)
-  if solver == "CPLEX"
-    solverSelected = solverSelectedCPLEX
-  else
-    solverSelected = solverSelectedMIP
-  end
+function modelMip_MonoProduit(solverSelected,D,P,H,F,M)
   ip, X, Y, S = setULPMIP(solverSelected,D,P,H,F,M)
   println("The optimization problem to be solved is:")
   print(ip)
@@ -32,7 +27,7 @@ end
 
 
 #---------------------------------------- Execution Modele3 amelioration tp1  ----------------------------------------------
-function formulationmodel3Tp1()
+function formulationmodel3Tp1(solverSelected,D,P,H,F,M)
   # C : Paramètre optionnel
   C = [2,2,2,2,2]
   ip, X, Y, S = model3(solverSelectedLP,D,P,H,F,M,C)

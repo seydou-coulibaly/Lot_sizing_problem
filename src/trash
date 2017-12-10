@@ -137,3 +137,155 @@ function miniBranchANDBound(solverSelected,D,P,H,F,B,C,M,V,PHI)
   println("r  = ",zr);
   return bornePrimale,zx,zy,zs,zr
 end
+# ---------------------------------------------------------------------------------
+# ********************** Jouer sur une petite instance (8x8 etant long)*******************
+n = 8
+t = 4
+P1 = zeros(n,t)
+F1 = zeros(n,t)
+H1 = zeros(n,t)
+D1 = zeros(n,t)
+C1 = zeros(t)
+B1 = zeros(n,t)
+M1 = zeros(n,t)
+V1 = zeros(n,t)
+PHI1 = zeros(n,t)
+for i = 1:n
+  for k = 1:t
+    P1[i,k] = P[i,k]
+    F1[i,k] = F[i,k]
+    H1[i,k] = H[i,k]
+    D1[i,k] = D[i,k]
+    C1[k] = C[k]
+    B1[i,k] = B[i,k]
+    M1[i,k] = M[i,k]
+    V1[i,k] = V[i,k]
+    PHI1[i,k] = PHI[i,k]
+  end
+
+end
+N,T = size(P1)
+println(N)
+println(T)
+
+for t = 1:T
+  print(trunc(Int,P1[1,t]));print(" ")
+end;
+
+println()
+for t = 1:T
+  print(trunc(Int,F1[1,t]));print(" ")
+end
+println()
+for t = 1:T
+  print(trunc(Int,P1[1,t]));print(" ")
+end
+println()
+
+for i = 1:N
+  for t = 1:T
+    print(trunc(Int,D1[i,t]));print(" ")
+  end
+end
+println()
+for t = 1:T
+  print(trunc(Int,C1[t]));print(" ")
+end
+println()
+for t = 1:T
+  print(trunc(Int,B1[t]));print(" ")
+end
+println()
+# ************************************************************************
+#resolutionMultiProduit(solverSelectedLP,D1,P1,H1,F1,B1,C1,M1,V1,PHI1)
+
+for k = 1:(N*T)
+  print(i);println(" ",t)
+  if i == N
+    i = 0
+    t+=1
+  end
+  i+=1
+end
+
+#---------------------------------------------------------------------------
+println("=======================   X ==========================")
+X = zeros(N,T)
+i = 1
+t = 1
+for k = 1:(N*T)
+  X[i,t] = x[k]
+  if i == N
+    i = 0
+    t+=1
+  end
+  i+=1
+end
+for i = 1:N
+  print("P",i);
+  for t = 1:T
+    print(" & ");print(trunc(Int,X[i,t]))
+  end
+  println(" \\\\ ")
+  println()
+end
+println("=======================   Y ==========================")
+Y = zeros(N,T)
+i = 1
+t = 1
+for k = 1:(N*T)
+  Y[i,t] = y[k]
+  if i == N
+    i = 0
+    t+=1
+  end
+  i+=1
+end
+for i = 1:N
+  print("P",i);
+  for t = 1:T
+    print(" & ");print(round(Y[i,t],2))
+  end
+  println(" \\\\ ")
+  println()
+end
+println("=======================   S ==========================")
+S = zeros(N,T)
+i = 1
+t = 1
+for k = 1:(N*T)
+  S[i,t] = s[k]
+  if i == N
+    i = 0
+    t+=1
+  end
+  i+=1
+end
+for i = 1:N
+  print("P",i);
+  for t = 1:T
+    print(" & ");print(trunc(Int,S[i,t]))
+  end
+  println(" \\\\ ")
+  println()
+end
+println("=======================   R ==========================")
+R = zeros(N,T)
+i = 1
+t = 1
+for k = 1:(N*T)
+  R[i,t] = r[k]
+  if i == N
+    i = 0
+    t+=1
+  end
+  i+=1
+end
+for i = 1:N
+  print("P",i);
+  for t = 1:T
+    print(" & ");print(trunc(Int,R[i,t]))
+  end
+  println(" \\\\ ")
+  println()
+end

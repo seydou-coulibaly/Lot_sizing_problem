@@ -11,7 +11,7 @@ solverSelectedMIP = GLPKSolverMIP()
 solverSelectedCPLEX = CplexSolver()
 
 
-function solveLotSizing(typeProbleme,nomInstance)
+function solveLotSizing(typeProbleme,nomInstance,solver)
   if typeof(nomInstance) == String
   #---------------------------------------- ULS -----------------------------------------------
     if typeProbleme == "ULS"
@@ -19,9 +19,18 @@ function solveLotSizing(typeProbleme,nomInstance)
       T       = length(D)
       # M est une constante de valeur très grande, ici 100
       M       = fill(100,T)
-      # appelle au branch and bound pour ULS
+      print(T);println(" Périodes")
       tic = time()
-      resolutionMonoProduit(solverSelectedLP,D,P,H,F,M)
+      if solver == "GLPK"
+        solverSelected = solverSelectedMIP
+        modelMip_MonoProduit(solverSelected,D,P,H,F,M,"GLPK")
+      elseif solver == "CPLEX"
+        solverSelected = solverSelectedCPLEX
+        modelMip_MonoProduit(solverSelected,D,P,H,F,M,"CPLEX")
+      else
+        resolutionMonoProduit(solverSelectedLP,D,P,H,F,M)
+      end
+      # calcule du temps effectué
       tac = time() - tic
       println();print("Time = ",round(tac,2));println(" Secondes")
     #-------------------------------------- CLS -----------------------------------------------
@@ -33,9 +42,18 @@ function solveLotSizing(typeProbleme,nomInstance)
       for t = 1:T
         M[t] = sum(D[k] for k=t:T)
       end
-      # appelle au branch and bound pour CLS
+      print(T);println(" Périodes")
       tic = time()
-      resolutionMonoProduit(solverSelectedLP,D,P,H,F,M)
+      if solver == "GLPK"
+        solverSelected = solverSelectedMIP
+        modelMip_MonoProduit(solverSelected,D,P,H,F,M)
+      elseif solver == "CPLEX"
+        solverSelected = solverSelectedCPLEX
+        modelMip_MonoProduit(solverSelected,D,P,H,F,M)
+      else
+        resolutionMonoProduit(solverSelectedLP,D,P,H,F,M)
+      end
+      # calcule du temps effectué
       tac = time() - tic
       println();print("Time = ",round(tac,2));println(" Secondes")
     #------------------------------------  MCLS  ----------------------------------------------
@@ -52,36 +70,16 @@ function solveLotSizing(typeProbleme,nomInstance)
             # M[i,t] = minimum(M)
         end
       end
+      println();print(N);print(" Produits")
+      print(" ET ");print(T);println(" Périodes")
       tic = time()
-      # ********************** Jouer sur une petite instance (8x8 etant long)*******************
-      n = 5
-      t = 5
-      P1 = zeros(n,t)
-      F1 = zeros(n,t)
-      H1 = zeros(n,t)
-      D1 = zeros(n,t)
-      C1 = zeros(t)
-      B1 = zeros(n,t)
-      M1 = zeros(n,t)
-      V1 = zeros(n,t)
-      PHI1 = zeros(n,t)
-      for i = 1:n
-        for k = 1:t
-          P1[i,k] = P[i,k]
-          F1[i,k] = F[i,k]
-          H1[i,k] = H[i,k]
-          D1[i,k] = D[i,k]
-          C1[k] = C[k]
-          B1[i,k] = B[i,k]
-          M1[i,k] = M[i,k]
-          V1[i,k] = V[i,k]
-          PHI1[i,k] = PHI[i,k]
-        end
+      if solver == "GLPK"
+        modelMIP_MultiProduit("GLPK",D,V,C,P,F,H,M,PHI,B)
+      elseif solver == "CPLEX"
+        modelMIP_MultiProduit("CPLEX",D,V,C,P,F,H,M,PHI,B)
+      else
+        resolutionMultiProduit(solverSelectedLP,D,P,H,F,B,C,M,V,PHI)
       end
-      # ************************************************************************
-      resolutionMultiProduit(solverSelectedLP,D1,P1,H1,F1,B1,C1,M1,V1,PHI1)
-      # appelle au branch and bound MCLS
-      # resolutionMultiProduit(solverSelectedLP,D,P,H,F,B,C,M,V,PHI)
       tac = time() - tic
       println();print("Time = ",round(tac,2));println(" Secondes")
     #---------------------------------------------------------------------------------------
@@ -96,9 +94,9 @@ end
 # =================================================================================================#
 #                       LANCEMENT SOLUTION LOGICIEL
 #==================================================================================================#
- solveLotSizing("MCLS","../data/pp08a.dat")
-# solveLotSizing("ULS","../data/instanceT5.dat")
-# solveLotSizing("CLS","../data/instanceT5.dat")
+# solveLotSizing("MCLS","../data/pp05a.dat","GLPK")
+# solveLotSizing("ULS","../data/instanceT5.dat","BB")
+# solveLotSizing("CLS","../data/instanceT5.dat","BB")
 
 
 
@@ -110,7 +108,7 @@ end
 #        2) Amélioration3 Model Tp1  ( GLPK est utilisé)
 #         formulationmodel3Tp1()
 #        3) Model MIP (paramètre = "CPLEX" ou "GLPK")
-#         modelMIP_MCLS("CPLEX")
+#         modelMIP_MultiProduit("CPLEX",D,V,C,P,F,H,M,PHI,B)
 #        4) Model LP (GLPK est utilié)
-#         modelLp_MCLS()
+#         modelLp_MultiProduit(solverSelectedLP,D,V,C,P,F,H,M,PHI,B)
 ####################################################

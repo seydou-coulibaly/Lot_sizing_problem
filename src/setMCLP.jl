@@ -29,10 +29,12 @@ function setMCLSP(solverSelected,D,V,C,P,F,H,M,PHI,B,Contraintes)
   for i=1:N
     for t=1:T
       @constraint(ip,X[i,t]-C[t]*Y[i,t] <= 0)
-      # ressources capacity constraint
-      @constraint(ip,sum(V[i,t]*X[i,t] + PHI[i,t]*Y[i,t]) <= C[t])
-      @constraint(ip,R[1,t] <= D[i,t])
+      @constraint(ip,R[i,t] <= D[i,t])
     end
+  end
+  for t = 1:T
+    # ressources capacity constraint
+    @constraint(ip,sum(V[i,t]*X[i,t] + PHI[i,t]*Y[i,t] for i=1:N) <= C[t])
   end
   # Contraintes pour branch and bound
   for i = 1:N
@@ -75,10 +77,12 @@ function setMCLSPMIP(solverSelected,D,V,C,P,F,H,M,PHI,B)
   for i=1:N
     for t=1:T
       @constraint(ip,X[i,t]-C[t]*Y[i,t] <= 0)
-      # ressources capacity constraint
-      @constraint(ip,sum(V[i,t]*X[i,t] + PHI[i,t]*Y[i,t]) <= C[t])
-      @constraint(ip,R[1,t] <= D[i,t])
+      @constraint(ip,R[i,t] <= D[i,t])
     end
+  end
+  for t = 1:T
+    # ressources capacity constraint
+    @constraint(ip,sum(V[i,t]*X[i,t] + PHI[i,t]*Y[i,t] for i=1:N) <= C[t])
   end
   return ip, X, Y, S, R
 end
