@@ -23,10 +23,10 @@ function solveLotSizing(typeProbleme,nomInstance,solver)
       tic = time()
       if solver == "GLPK"
         solverSelected = solverSelectedMIP
-        modelMip_MonoProduit(solverSelected,D,P,H,F,M,"GLPK")
+        modelMip_MonoProduit(solverSelected,D,P,H,F,M)
       elseif solver == "CPLEX"
         solverSelected = solverSelectedCPLEX
-        modelMip_MonoProduit(solverSelected,D,P,H,F,M,"CPLEX")
+        modelMip_MonoProduit(solverSelected,D,P,H,F,M,)
       else
         resolutionMonoProduit(solverSelectedLP,D,P,H,F,M)
       end
