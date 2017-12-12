@@ -23,12 +23,14 @@ function modelLp_MultiProduit(solverSelectedLP,D,V,C,P,F,H,M,PHI,B)
     s = getvalue(S)
     r = getvalue(R)
 
+    #=
     println("X  : ",x);
     println("Y  : ",y);
     println("S  : ",s);
     println("R  : ",r);
 
-    #=
+    =#
+
 
     println("=======================   X ==========================")
     X = zeros(N,T)
@@ -43,7 +45,7 @@ function modelLp_MultiProduit(solverSelectedLP,D,V,C,P,F,H,M,PHI,B)
       i+=1
     end
     for i = 1:N
-      print("P",i);
+      # print("P",i);
       for t = 1:T
         print("  ");
         print(trunc(Int,X[i,t]))
@@ -64,7 +66,7 @@ function modelLp_MultiProduit(solverSelectedLP,D,V,C,P,F,H,M,PHI,B)
       i+=1
     end
     for i = 1:N
-      print("P",i);
+      # print("P",i);
       for t = 1:T
         print("  ");print(round(Y[i,t],2))
       end
@@ -84,7 +86,7 @@ function modelLp_MultiProduit(solverSelectedLP,D,V,C,P,F,H,M,PHI,B)
       i+=1
     end
     for i = 1:N
-      print("P",i);
+      # print("P",i);
       for t = 1:T
         print("  ");print(trunc(Int,S[i,t]))
       end
@@ -104,14 +106,14 @@ function modelLp_MultiProduit(solverSelectedLP,D,V,C,P,F,H,M,PHI,B)
       i+=1
     end
     for i = 1:N
-      print("P",i);
+      # print("P",i);
       for t = 1:T
         print("  ");print(trunc(Int,R[i,t]))
       end
       #println(" \\\\ ")
       println()
     end
-    =#
+
   end
 
 end
@@ -139,12 +141,14 @@ function modelMIP_MultiProduit(solver,D,V,C,P,F,H,M,PHI,B)
     s = getvalue(S)
     r = getvalue(R)
 
+    #=
     println("X  : ",x);
     println("Y  : ",y);
     println("S  : ",s);
     println("R  : ",r);
 
-    #=
+    =#
+
 
 
 
@@ -161,9 +165,9 @@ function modelMIP_MultiProduit(solver,D,V,C,P,F,H,M,PHI,B)
       i+=1
     end
     for i = 1:N
-      print("P",i);
+      # print("P",i);
       for t = 1:T
-        print("  ");print(round(X[i,t],2) )
+        print("  ");print(trunc(Int,X[i,t]) )
       end
       #print("\\\\")
       println()
@@ -181,7 +185,7 @@ function modelMIP_MultiProduit(solver,D,V,C,P,F,H,M,PHI,B)
       i+=1
     end
     for i = 1:N
-      print("P",i);
+      # print("P",i);
       for t = 1:T
         print("  ");print(trunc(Int,Y[i,t]))
       end
@@ -201,7 +205,7 @@ function modelMIP_MultiProduit(solver,D,V,C,P,F,H,M,PHI,B)
       i+=1
     end
     for i = 1:N
-      print("P",i);
+      # print("P",i);
       for t = 1:T
         print("  ");print(trunc(Int,S[i,t]))
       end
@@ -221,14 +225,14 @@ function modelMIP_MultiProduit(solver,D,V,C,P,F,H,M,PHI,B)
       i+=1
     end
     for i = 1:N
-      print("P",i);
+      # print("P",i);
       for t = 1:T
         print("  ");print(trunc(Int,R[i,t]))
       end
       #print("\\\\")
       println()
     end
-    =#
+
   end
 
 end

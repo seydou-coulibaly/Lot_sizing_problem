@@ -19,11 +19,10 @@ function setMCLSP(solverSelected,D,V,C,P,F,H,M,PHI,B,Contraintes)
   # Constraints of problem
   # constraint 1 (contrôle de flux)
   for i=1:N
-    for t=2:N
+    for t=2:T
       @constraint(ip,X[i,t]+R[i,t]-R[i,t-1]+S[i,t-1]-D[i,t]-S[i,t] == 0)
     end
     @constraint(ip,X[i,1]+R[i,1]-D[i,1]-S[i,1] == 0)
-
   end
   # constraint 2 (if Y = 0 then X == 0)
   for i=1:N
@@ -67,7 +66,7 @@ function setMCLSPMIP(solverSelected,D,V,C,P,F,H,M,PHI,B)
   #Constraints of problem
   # constraint 1 (contrôle de flux)
   for i=1:N
-    for t=2:N
+    for t=2:T
       @constraint(ip,X[i,t]+R[i,t]-R[i,t-1]+S[i,t-1]-D[i,t]-S[i,t] == 0)
     end
     @constraint(ip,X[i,1]+R[i,1]-D[i,1]-S[i,1] == 0)
