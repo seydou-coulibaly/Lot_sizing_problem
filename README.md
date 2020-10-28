@@ -1,0 +1,33 @@
+# LSP
+Resolving operations research 's " Lot sizing problem" during Master 1 student pratical work
+
+
+
+          #######################################################################################
+                      Indication utilisation de la solution logicielle
+          #######################################################################################
+            Le projet est structuré de la sorte :
+              doc : ce rapport en format PDF
+              src : Les fichiers sources de notre application accompagné d'un README reprenant cette section du rapport
+              dat : Les fichiers d'instances de notre application
+
+              ######################
+                    EXECUTION
+              ######################
+                1) Se potionner dans le dossier src
+                2) Lancer include("main.jl")
+                3) Faire des test sur les instances en utilisant
+                      ######################################################
+                      solveLotSizing(typeProbleme,nomInstance,Parametre)
+                      ######################################################
+                Où :
+                  typeProbleme = "ULS" ou "CLS" ou "MCLS"
+                  nomInstance  = chemin de l'instance (par exemple : "../data/pp04a.dat")
+                  Parametre    = "GLPK" ou "CPLEX" ou "BB"
+
+                      ########
+                      GLPK  : Solveur GLPK en résolution MIPS
+                      CPLEX : Solveur CPLEX en résolution MIPS
+                      BB    : Algorithme Branch and Bound implementé
+
+    ############################################################################################################################
